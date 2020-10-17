@@ -1,0 +1,11 @@
+C:\Users\Пользователь\source\repos\Moiu2\bin\Debug\netcoreapp3.0\Moiu2.exe
+C:\Users\Пользователь\source\repos\Moiu2\bin\Debug\netcoreapp3.0\Moiu2.deps.json
+C:\Users\Пользователь\source\repos\Moiu2\bin\Debug\netcoreapp3.0\Moiu2.runtimeconfig.json
+C:\Users\Пользователь\source\repos\Moiu2\bin\Debug\netcoreapp3.0\Moiu2.runtimeconfig.dev.json
+C:\Users\Пользователь\source\repos\Moiu2\bin\Debug\netcoreapp3.0\Moiu2.dll
+C:\Users\Пользователь\source\repos\Moiu2\bin\Debug\netcoreapp3.0\Moiu2.pdb
+C:\Users\Пользователь\source\repos\Moiu2\obj\Debug\netcoreapp3.0\Moiu2.csprojAssemblyReference.cache
+C:\Users\Пользователь\source\repos\Moiu2\obj\Debug\netcoreapp3.0\Moiu2.AssemblyInfoInputs.cache
+C:\Users\Пользователь\source\repos\Moiu2\obj\Debug\netcoreapp3.0\Moiu2.AssemblyInfo.cs
+C:\Users\Пользователь\source\repos\Moiu2\obj\Debug\netcoreapp3.0\Moiu2.dll
+C:\Users\Пользователь\source\repos\Moiu2\obj\Debug\netcoreapp3.0\Moiu2.pdb

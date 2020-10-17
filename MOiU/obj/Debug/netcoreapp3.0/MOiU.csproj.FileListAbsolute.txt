@@ -1,0 +1,11 @@
+C:\Users\Пользователь\source\repos\MOiU\bin\Debug\netcoreapp3.0\MOiU.exe
+C:\Users\Пользователь\source\repos\MOiU\bin\Debug\netcoreapp3.0\MOiU.deps.json
+C:\Users\Пользователь\source\repos\MOiU\bin\Debug\netcoreapp3.0\MOiU.runtimeconfig.json
+C:\Users\Пользователь\source\repos\MOiU\bin\Debug\netcoreapp3.0\MOiU.runtimeconfig.dev.json
+C:\Users\Пользователь\source\repos\MOiU\bin\Debug\netcoreapp3.0\MOiU.dll
+C:\Users\Пользователь\source\repos\MOiU\bin\Debug\netcoreapp3.0\MOiU.pdb
+C:\Users\Пользователь\source\repos\MOiU\obj\Debug\netcoreapp3.0\MOiU.csprojAssemblyReference.cache
+C:\Users\Пользователь\source\repos\MOiU\obj\Debug\netcoreapp3.0\MOiU.AssemblyInfoInputs.cache
+C:\Users\Пользователь\source\repos\MOiU\obj\Debug\netcoreapp3.0\MOiU.AssemblyInfo.cs
+C:\Users\Пользователь\source\repos\MOiU\obj\Debug\netcoreapp3.0\MOiU.dll
+C:\Users\Пользователь\source\repos\MOiU\obj\Debug\netcoreapp3.0\MOiU.pdb
