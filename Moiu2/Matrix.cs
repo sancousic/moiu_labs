@@ -1,205 +1,320 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 
 namespace Moiu2
 {
-    class Matrix
+    /// <summary>
+    /// The rectangular array or table of numbers, symbols, or expressions,
+    /// arranged in rows and columns, which is used to represent a mathematical object or a property of such an object.
+    /// </summary>
+    public class Matrix : ICloneable
     {
-        private double[,] data;
-        private double[,] Data
-        {
-            get => data;
-            set
-            {
-                data = value;
-                Update();
-            }
-        }
-        public int N { get; private set; }
-        public int M { get; private set; }
-        private void Update()
-        {
-            if (Data != null)
-            {
-                N = Data.GetUpperBound(0) + 1;
-                if (N != 0)
-                    M = Data.Length / N;
-            }
-            else
-            {
-                N = 0;
-                M = 0;
-            }
-        }
-        public double this[int x, int y]
-        {
-            get
-            {
-                return Data[x, y];
-            }
-            set
-            {
-                Data[x, y] = value;
-            }
-        }
-        public double this[int x]
-        {
-            get
-            {
-                if (M == 1)
-                    return Data[x, 0];
-                return Data[0, x];
-            }
-            set
-            {
-                if (M == 1)
-                    Data[x, 0] = value;
-                else Data[0, x] = value;
-            }
-        }
+        private double[,] _data;
+
+        /// <summary>
+        /// Creates matrix with dimension n n m.
+        /// </summary>
+        /// <param name="n">Number of matrix rows.</param>
+        /// <param name="m">Number of matrix columns.</param>
         public Matrix(int n, int m)
         {
             Data = new double[n, m];
         }
+
+        /// <summary>
+        /// Creates square matrix of order n.
+        /// </summary>
+        /// <param name="n">Order of square matrix.</param>
         public Matrix(int n) : this(n, n) { }
-        public Matrix(Matrix matrix)
-        {
-            Data = (double[,])matrix.Data.Clone();
-        }
+
         public Matrix(double[,] vs)
         {
             Data = (double[,])vs.Clone();
         }
-        public override string ToString()
+
+        /// <summary>
+        /// Number of matrix rows.
+        /// </summary>
+        public int N { get; private set; }
+
+        /// <summary>
+        /// Number of matrix columns.
+        /// </summary>
+        public int M { get; private set; }
+
+        /// <summary>
+        /// Gets element on n x m position.
+        /// </summary>
+        /// <param name="n">Row position.</param>
+        /// <param name="m">Column position.</param>
+        /// <returns></returns>
+        public double this[int n, int m]
         {
-            StringBuilder str = new StringBuilder("");
-            for (int i = 0; i < N; i++)
-            {
-                for (int j = 0; j < M; j++)
-                {
-                    str.Append(Data[i, j].ToString("0.00") + " ");
-                }
-                str.Append("\n");
-            }
-            return str.ToString();
+            get => Data[n, m];
+            set => Data[n, m] = value;
         }
-        public static Matrix operator -(Matrix mat1, Matrix mat2)
+
+        /// <summary>
+        /// Gets element of vector by on n position.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns></returns>
+        public double this[int n]
         {
-            if (mat1.N == mat2.N & mat1.M == mat2.M)
+            get => M == 1
+                ? Data[n, 0]
+                : Data[0, n];
+            set
             {
-                var result = new Matrix(mat1.N, mat2.M);
-
-                for (int i = 0; i < mat1.N; i++)
+                if (M == 1)
                 {
-                    for (int j = 0; j < mat1.M; j++)
-                    {
-                        result[i, j] = mat1[i, j] - mat2[i, j];
-                    }
+                    Data[n, 0] = value;
                 }
-
-                return result;
+                else
+                {
+                    Data[0, n] = value;
+                }
             }
-            else return new Matrix(0, 0);
         }
-        public static Matrix operator +(Matrix mat1, Matrix mat2)
+
+        private double[,] Data
         {
-            if (mat1.N == mat2.N & mat1.M == mat2.M)
+            get => _data;
+            set
             {
-                var result = new Matrix(mat1.N, mat2.M);
-
-                for (int i = 0; i < mat1.N; i++)
-                {
-                    for (int j = 0; j < mat1.M; j++)
-                    {
-                        result[i, j] = mat1[i, j] + mat2[i, j];
-                    }
-                }
-
-                return result;
+                _data = value;
+                UpdateDataBounds();
             }
-            else return new Matrix(0, 0);
         }
+
+        /// <summary>
+        /// Gets a difference between matrix objects.
+        /// </summary>
+        /// <param name="left">Left operand of the difference.</param>
+        /// <param name="right">Right operand of the difference.</param>
+        /// <returns>New instance of <see cref="Matrix"/> that represents the difference between instances.</returns>
+        public static Matrix operator -(Matrix left, Matrix right)
+        {
+            if (!(left.N == right.N & left.M == right.M))
+            {
+                throw new ArgumentException(
+                    $"Dimension should be equals but was {left.N}x{left.M} and {right.N}x{right.M}.");
+            }
+
+            var result = new Matrix(left.N, right.M);
+
+            for (var i = 0; i < left.N; i++)
+            {
+                for (var j = 0; j < left.M; j++)
+                {
+                    result[i, j] = left[i, j] - right[i, j];
+                }
+            }
+
+            return result;
+
+        }
+
+        /// <summary>
+        /// Gets the sum between matrix objects.
+        /// </summary>
+        /// <param name="left">Left operand of the sum.</param>
+        /// <param name="right">Right operand of the sum.</param>
+        /// <returns>New instance of <see cref="Matrix"/> that represents the sum between instances.</returns>
+        public static Matrix operator +(Matrix left, Matrix right)
+        {
+            if (!(left.N == right.N & left.M == right.M))
+            {
+                throw new ArgumentException(
+                    $"Dimension should be equals but was {left.N}x{left.M} and {right.N}x{right.M}.");
+            }
+
+            var result = new Matrix(left.N, right.M);
+
+            for (var i = 0; i < left.N; i++)
+            {
+                for (var j = 0; j < left.M; j++)
+                {
+                    result[i, j] = left[i, j] + right[i, j];
+                }
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Gets the matrix multiplied by a number.
+        /// </summary>
+        /// <param name="matrix">The instance of <see cref="Matrix"/>.</param>
+        /// <param name="value">The number.</param>
+        /// <returns>New instance of <see cref="Matrix"/>
+        /// all elements of which are multiplied by number.</returns>
         public static Matrix operator *(Matrix matrix, double value)
         {
             var result = new Matrix(matrix.N, matrix.M);
 
-            for (int i = 0; i < matrix.N; i++)
+            for (var i = 0; i < matrix.N; i++)
             {
-                for (int j = 0; j < matrix.M; j++)
+                for (var j = 0; j < matrix.M; j++)
                 {
                     result[i, j] = matrix[i, j] * value;
                 }
             }
+
             return result;
         }
+
+        /// <summary>
+        /// Gets the matrix multiplied by a number.
+        /// </summary>
+        /// <param name="matrix">The instance of <see cref="Matrix"/>.</param>
+        /// <param name="value">The number.</param>
+        /// <returns>New instance of <see cref="Matrix"/>
+        /// all elements of which are multiplied by number.</returns>
         public static Matrix operator *(double value, Matrix matrix)
         {            
             return matrix * value;
         }
 
-        public static Matrix operator *(Matrix mat1, Matrix mat2)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="left"></param>
+        /// <param name="right"></param>
+        /// <returns></returns>
+        public static Matrix operator *(Matrix left, Matrix right)
         {
-            var result = new Matrix(mat1.N, mat2.M);
+            var result = new Matrix(left.N, right.M);
 
-            if (mat1.M == mat2.N)
+            if (left.M != right.N)
             {
-                for (int i = 0; i < mat1.N; i++)
-                {
-                    for (int j = 0; j < mat2.M; j++)
-                    {
-                        double t = 0.0;
-                        for (int s = 0; s < mat1.M; s++)
-                        {
-                            t += mat1[i, s] * mat2[s, j];
-                        }
-                        result[i, j] = t;
-                    }
-                }
-                return result;
+                throw new ArgumentException(
+                    "Rows of right matrix should be equal the number of columns of the left matrix." +
+                    $" But was {right.N} and {left.M}");
             }
-            return new Matrix(0, 0);
+
+            for (var i = 0; i < left.N; i++)
+            {
+                for (var j = 0; j < right.M; j++)
+                {
+                    var t = 0.0;
+
+                    for (var s = 0; s < left.M; s++)
+                    {
+                        t += left[i, s] * right[s, j];
+                    }
+
+                    result[i, j] = t;
+                }
+            }
+
+            return result;
         }
+
+        /// <inheritdoc/>
+        public override string ToString()
+        {
+            var str = new StringBuilder();
+
+            for (var i = 0; i < N; i++)
+            {
+                for (var j = 0; j < M; j++)
+                {
+                    str.Append(Data[i, j].ToString("0.00") + " ");
+                }
+
+                str.Append("\n");
+            }
+
+            return str.ToString();
+        }
+
+        /// <inheritdoc/>
+        public object Clone()
+        {
+            return new Matrix((double[,])Data.Clone());
+        }
+
+        /// <summary>
+        /// Creates the identity matrix.
+        /// The identity matrix of size N x N is the N x N square matrix
+        /// with ones on the main diagonal and zeros elsewhere.
+        /// </summary>
+        /// <param name="n"></param>
+        /// <returns>New instance of <see cref="Matrix"/> that represents identity matrix.</returns>
         public static Matrix E(int n)
         {
-            Matrix res = new Matrix(n);
-            for (int i = 0; i < n; i++)
+            var res = new Matrix(n);
+
+            for (var i = 0; i < n; i++)
             {
                 res[i, i] = 1;
             }
+
             return res;
         }
-        public static Matrix e(int len, int i)
+
+        /// <summary>
+        /// Creates a matrix-vector with dimension n and 1 on i position and zeros elsewhere.
+        /// </summary>
+        /// <param name="n">Number of matrix rows.</param>
+        /// <param name="i"></param>
+        /// <returns></returns>
+        public static Matrix E(int n, int i)
         {
-            Matrix res = new Matrix(1, len);
-            res[0, i] = 1;
+            var res = new Matrix(1, n)
+            {
+                [0, i] = 1
+            };
+
             return res;
         }
-        public static Matrix GetRow(int length, double value = 0)
+
+        public static Matrix CreateRowVector(int length, double value = 0)
         {
-            Matrix res = new Matrix(1, length);
-            for(int i = 0; i < res.M; i++)
+            var res = new Matrix(1, length);
+
+            for(var i = 0; i < res.M; i++)
             {
                 res[0, i] = value;
             }
+
             return res;
         }
-        public static Matrix GetCol(int length, double value = 0)
+
+        public static Matrix CreateColumnVector(int length, double value = 0)
         {
-            Matrix res = new Matrix(length, 1);
-            for (int i = 0; i < res.N; i++)
+            var res = new Matrix(length, 1);
+
+            for (var i = 0; i < res.N; i++)
             {
                 res[i, 0] = value;
             }
+
             return res;
         }
-        public Matrix GetTranstoseMatrix()
-        {
-            Matrix res = new Matrix(M, N);
 
-            for (int i = 0; i < M; i++)
+
+        public Matrix GetRow(int i)
+        {
+            var res = new Matrix(1, M);
+
+            for (var j = 0; j < M; j++)
             {
-                for (int j = 0; j < N; j++)
+                res[0, j] = this[i, j];
+            }
+
+            return res;
+        }
+
+
+        public Matrix GetTransposeMatrix()
+        {
+            var res = new Matrix(M, N);
+
+            for (var i = 0; i < M; i++)
+            {
+                for (var j = 0; j < N; j++)
                 {
                     res[i, j] = Data[j, i];
                 }
@@ -207,77 +322,70 @@ namespace Moiu2
 
             return res;
         }
+
         public Matrix GetColumn(int j)
         {
-            Matrix res = new Matrix(N, 1);
+            var res = new Matrix(N, 1);
             
-            for(int i = 0; i < N; i++)
+            for(var i = 0; i < N; i++)
             {
                 res[i, 0] = this[i, j];
             }
 
             return res;
         }
-        public Matrix GetRow(int i)
-        {
-            Matrix res = new Matrix(1, M);
 
-            for (int j = 0; j < M; j++)
-            {
-                res[0, j] = this[i, j];
-            }
-
-            return res;
-        }
-        public Matrix RemooveRow(int row)
+        public Matrix RemoveRow(int row)
         {
-            Matrix res = new Matrix(N - 1, M);
-            int add = 0;
-            for (int i = 0; i < N; i++)
+            var res = new Matrix(N - 1, M);
+            var add = 0;
+            for (var i = 0; i < N; i++)
             {
                 if (i == row)
                 {
                     add = -1;
                     continue;
                 }
-                for (int j = 0; j < M; j++)
+                for (var j = 0; j < M; j++)
                 {
                     res[i + add, j] = Data[i, j];
                 } 
             }
             return res;
         }
-        public Matrix RemooveCol(int col)
+
+        public Matrix RemoveCol(int col)
         {
-            Matrix res = new Matrix(N, M - 1);
-            for(int i = 0; i < N; i++)
+            var res = new Matrix(N, M - 1);
+            for(var i = 0; i < N; i++)
             {
-                int add = 0;
-                for(int j = 0; j < M; j++)
+                var add = 0;
+                for(var j = 0; j < M; j++)
                 {
                     if(j == col)
                     {
                         add = -1;
                         continue;
                     }
-                    res[i, j + add] = data[i, j];
+                    res[i, j + add] = _data[i, j];
                 }
             }
             return res;
         }
-        public Matrix RemooveRC(int row, int col)
+
+        public Matrix RemoveRC(int row, int col)
         {
-            Matrix res = new Matrix(N - 1, M - 1);
-            int addR = 0;
-            for(int i = 0; i < N; i++)
+            var res = new Matrix(N - 1, M - 1);
+            var addR = 0;
+            for(var i = 0; i < N; i++)
             {
-                int addC = 0;
+                var addC = 0;
                 if(i == row)
                 {
                     addR = -1;
                     continue;
                 }
-                for(int j = 0; j < M; j++)
+                for(var j = 0; j < M; j++)
                 {
                     if(j == col)
                     {
@@ -289,19 +397,20 @@ namespace Moiu2
             }
             return res;
         }
+
         public Matrix Extend(Matrix matrix)
         {
             if (N == matrix.N)
             {
-                Matrix res = new Matrix(N, M + matrix.M);
+                var res = new Matrix(N, M + matrix.M);
 
-                for (int i = 0; i < N; i++)
+                for (var i = 0; i < N; i++)
                 {
-                    for (int j = 0; j < M; j++)
+                    for (var j = 0; j < M; j++)
                     {
                         res[i, j] = Data[i, j];
                     }
-                    for (int j = M; j < M + matrix.M; j++)
+                    for (var j = M; j < M + matrix.M; j++)
                     {
                         res[i, j] = matrix[i, j-M];
                     }
@@ -310,45 +419,49 @@ namespace Moiu2
             }
             throw new Exception("Cannot extend with matrix");
         }
+
         public Matrix AppendRow(Matrix matrix)
         {
             Matrix res;
             if(N == 1 && matrix.N == 1)
             {
                 res = new Matrix(1, M + matrix.M);
-                for (int j = 0; j < M; j++)
+                for (var j = 0; j < M; j++)
                     res[0, j] = Data[0, j];
-                for (int j = M; j < M + matrix.M; j++)
+                for (var j = M; j < M + matrix.M; j++)
                     res[0, j] = matrix[0, j - M];
                 return res;
             }
             throw new Exception("cant append");
         }
+
         public Matrix AppendCol(Matrix matrix)
         {
             Matrix res;
             if(M == 1 && matrix.M == 1)
             {
                 res = new Matrix(N + matrix.N, 1);
-                for (int i = 0; i < N; i++)
+                for (var i = 0; i < N; i++)
                     res[i, 0] = Data[i, 0];                
-                for(int i = N; i < N + matrix.N; i++)
+                for(var i = N; i < N + matrix.N; i++)
                     res[i, 0] = matrix[i - N, 0];                
                 return res;
             }
             throw new Exception("cant append");
         }
+
         public Matrix ExtendE()
         {
             return Extend(Matrix.E(N));
         }
+
         public Matrix GetExtendPart()
         {
-            Matrix res = new Matrix(N, M / 2);
+            var res = new Matrix(N, M / 2);
 
-            for(int i = 0; i < res.N; i++)
+            for(var i = 0; i < res.N; i++)
             {
-                for (int j = 0; j < res.M; j++)
+                for (var j = 0; j < res.M; j++)
                 {
                     res[i, j] = this[i, M / 2 + j];
                 }
@@ -356,36 +469,39 @@ namespace Moiu2
 
             return res;
         }
+
         private void ChangeRows(int a, int b)
         {
-            for(int i = 0; i < M; i++)
+            for(var i = 0; i < M; i++)
             {
                 var temp = Data[a, i];
                 Data[a, i] = Data[b, i];
                 Data[b, i] = temp;
             }
         }
+
         private int FindMaxIndexInCol(int j)
         {
-            int res = -1;
-            double val = 1E-20;
-            for(int i = 0; i < N; i++)
+            var res = -1;
+            var val = 1E-20;
+            for(var i = 0; i < N; i++)
             {
                 if(Math.Abs(Data[i,j]) > Math.Abs(val))
                 {
                     res = i;
-                    val = data[i, j];
+                    val = _data[i, j];
                 }
             }
             return res;
         }
+
         public Matrix GetDiagonolizeUnder()
         {
-            Matrix res = new Matrix(this);
+            var res = new Matrix(this);
 
-            for (int i = 0; i < N - 1; i++)
+            for (var i = 0; i < N - 1; i++)
             {
-                for(int j = i + 1; j < N; j++)
+                for(var j = i + 1; j < N; j++)
                 {
                     if(Math.Abs(res[i,i]) < 1.0E-20)
                     {
@@ -397,8 +513,8 @@ namespace Moiu2
                             res.ChangeRows(max, i);
                         }
                     }
-                    double temp = res[j, i];                    
-                    for (int k = 0; k < M; k++)
+                    var temp = res[j, i];                    
+                    for (var k = 0; k < M; k++)
                     {
                         res[j, k] -= res[i, k] * temp / res[i, i];
                     }
@@ -406,13 +522,14 @@ namespace Moiu2
             }
             return res;
         }
+
         public Matrix GetDiagonolizeUpper()
         {
-            Matrix res = new Matrix(this);
+            var res = new Matrix(this);
 
-            for (int i = N - 1; i >= 0; i--)
+            for (var i = N - 1; i >= 0; i--)
             {
-                for(int j = i - 1; j >= 0; j--)
+                for(var j = i - 1; j >= 0; j--)
                 {
                     if(Math.Abs(res[i,i]) < 1E-20)
                     {
@@ -424,8 +541,8 @@ namespace Moiu2
                             res.ChangeRows(max, i);
                         }
                     }
-                    double temp = res[j, i];
-                    for (int k = 0; k < M; k++)
+                    var temp = res[j, i];
+                    for (var k = 0; k < M; k++)
                     {
                         res[j, k] -= res[i, k] * temp / res[i, i];
                     }
@@ -434,60 +551,82 @@ namespace Moiu2
 
             return res;
         }
+
         public double GetDeterminant()
         {
-            Matrix diagonolize = GetDiagonolizeUnder().GetDiagonolizeUpper();
+            var diagonolize = GetDiagonolizeUnder().GetDiagonolizeUpper();
             double det = 1;
 
-            for(int i = 0; i < N; i++)
+            for(var i = 0; i < N; i++)
             {
                 det *= diagonolize[i, i];
             }
             return det;
         }
+
         public Matrix GetReverse()
         {
-            Matrix diagonolize = ExtendE()
+            var diagonolize = ExtendE()
                 .GetDiagonolizeUnder()
                 .GetDiagonolizeUpper();
 
-            for(int i = 0; i < N; i++)
+            for(var i = 0; i < N; i++)
             {
-                double temp = diagonolize[i, i];
+                var temp = diagonolize[i, i];
 
-                for (int j = 0; j < diagonolize.M; j++)
+                for (var j = 0; j < diagonolize.M; j++)
                 {
                     diagonolize[i, j] /= temp;
                 }
             }
             return diagonolize.GetExtendPart();
         }
+
         public void ReplaceVector(Matrix vector, int pos)
         {
             if (pos < N)
             {
-                for (int i = 0; i < vector.N; i++)
+                for (var i = 0; i < vector.N; i++)
                 {
-                    data[i, pos] = vector[i, 0];
+                    _data[i, pos] = vector[i, 0];
                 }
             }
         }
+
         public static Matrix GetReverse(Matrix A, Matrix A_reverce, Matrix x, int i)
         {
-            Matrix matrix = new Matrix(A);
+            var matrix = new Matrix(A);
 
             matrix.ReplaceVector(x, 0);
-            Matrix L = A_reverce * x;
+            var L = A_reverce * x;
             if(L[i]==0)
             {
                 throw new Exception("Матрица необратима.");
             }
-            Matrix L_1 = new Matrix(L);
+            var L_1 = new Matrix(L);
             L_1[i, 0] = -1;
-            Matrix L_2 = L_1 * (-1 / L[i, 0]);
-            Matrix E = Matrix.E(A.N);
+            var L_2 = L_1 * (-1 / L[i, 0]);
+            var E = Matrix.E(A.N);
             E.ReplaceVector(L_2, i);
             return E * A_reverce;
+        }
+
+        private void UpdateDataBounds()
+        {
+            if (Data != null)
+            {
+                N = Data.GetUpperBound(0) + 1;
+
+                if (N != 0)
+                {
+                    M = Data.Length / N;
+                }
+            }
+            else
+            {
+                N = 0;
+                M = 0;
+            }
         }
     }
 }
